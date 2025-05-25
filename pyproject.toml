@@ -1,0 +1,19 @@
+[project]
+name = "data"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Ayodeji O", email = "97124713+aosasona@users.noreply.github.com" },
+]
+requires-python = ">=3.11"
+dependencies = [
+    "coremltools>=8.3.0",
+    "pandas>=2.1.0",
+    "scikit-learn>=1.5.1",
+    "tensorflow>=2.13.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
