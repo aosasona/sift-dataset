@@ -16,7 +16,7 @@ def merge_label(label: str) -> str:
     label = label.strip().upper()
 
     if label in ["AI", "COGNITIVE SCIENCE"]:
-        return "AI"
+        return "ARTIFICIAL INTELLIGENCE"
 
     elif label in ["PROGRAMMING", "DEVOPS", "OPERATING SYSTEMS", "DESIGN", "COMPUTER SCIENCE"]:
         return "ENGINEERING"
