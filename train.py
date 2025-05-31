@@ -26,7 +26,7 @@ def coreml_convert():
         labels = json.load(f)
 
     mlmodel = ct.convert(
-        "news_classifier",
+        "articles_classifier",
         source="tensorflow",
         inputs=[ct.TensorType(shape=(1, 40), dtype=np.int32)],
         classifier_config=ct.ClassifierConfig(class_labels=labels),
@@ -34,13 +34,13 @@ def coreml_convert():
         convert_to="mlprogram",
         minimum_deployment_target=ct.target.iOS15
     )
-    mlmodel.save("NewsClassifier.mlpackage")
+    mlmodel.save("ArticlesClassifier.mlpackage")
     print("✅ Saved CoreML model")
 
 
 def tflite_convert():
     # Configure converter
-    converter = tf.lite.TFLiteConverter.from_saved_model("news_classifier")
+    converter = tf.lite.TFLiteConverter.from_saved_model("articles_classifier")
     converter.target_spec.supported_ops = [
         tf.lite.OpsSet.TFLITE_BUILTINS,     # TFLite native ops
         tf.lite.OpsSet.SELECT_TF_OPS        # Allow TF ops fallback
@@ -53,14 +53,14 @@ def tflite_convert():
     tflite_model = converter.convert()
 
     # Save
-    with open("news_classifier.tflite", "wb") as f:
+    with open("articles_classifier.tflite", "wb") as f:
         f.write(tflite_model)
 
     print("✅ Saved TFLite model")
 
 
 # Load the processed dataset
-df = pd.read_csv('./news_dataset.csv')
+df = pd.read_csv('./dataset.csv')
 
 x = df["text"].values
 y = df["label"].values
@@ -125,8 +125,8 @@ model.fit(
     callbacks=[early_stop]
 )
 
-# model.save("./news_classifier.keras")
-model.save("news_classifier", save_format="tf")
+# model.save("./articles_classifier.keras")
+model.save("articles_classifier", save_format="tf")
 print("Model trained and saved successfully!")
 
 # Export vocab

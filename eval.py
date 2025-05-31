@@ -46,14 +46,14 @@ with open("label_map.json") as f:
     label_names = json.load(f)
 
 # === Load dataset and split ===
-df = pd.read_csv("news_dataset.csv")
+df = pd.read_csv("dataset.csv")
 x = df["text"].astype(str).tolist()
 y = df["label"].values
 _, x_val_raw, _, y_val = train_test_split(x, y, test_size=0.2, stratify=y)
 
 x_val = tokenize(x_val_raw)
 
-model = tf.keras.models.load_model("news_classifier")
+model = tf.keras.models.load_model("articles_classifier")
 
 # === Predict ===
 y_probs = model.predict(x_val)

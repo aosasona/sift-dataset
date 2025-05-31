@@ -6,6 +6,6 @@
 # ///
 import coremltools as ct
 
-model = ct.models.MLModel("NewsClassifier.mlpackage")
+model = ct.models.MLModel("ArticlesClassifier.mlpackage")
 print("Input(s):", model.input_description)
 print("Output(s):", model.output_description)

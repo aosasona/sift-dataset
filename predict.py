@@ -11,7 +11,7 @@ import numpy as np
 import tensorflow as tf
 
 # Load saved model
-model = tf.keras.models.load_model("news_classifier")
+model = tf.keras.models.load_model("articles_classifier")
 
 # Load label map
 with open("label_map.json") as f:

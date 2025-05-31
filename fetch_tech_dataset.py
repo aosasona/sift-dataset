@@ -25,26 +25,44 @@ client = OpenAI(
 REQUEST_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
 }
-TAGS = [
-    "ai",
-    "compsci",
-    "compilers",
-    "cryptography",
-    "databases",
-    "finance",
-    "hardware",
-    "networking",
-    "programming",
-    "performance",
-    "plt",
-    "practices",
-    "privacy",
-    "release",
-    "security",
-]
 
-MIN_COUNT = 50
-MAX_PAGES = 20
+TAG_CATEGORIES = {
+    "ai": ["ai"],
+    "computer science": ["compsci", "formalmethods", "networking", "plt"],
+    "culture": ["culture", "person", "philosophy"],
+    "law": ["law"],
+    "cognitive science": ["cogsci"],
+    "cryptography": ["cryptography"],
+    "education": ["education"],
+    "finance": ["finance"],
+    "hardware": ["hardware"],
+    "mathematics": ["math"],
+    "science": ["science"],
+    "art": ["art"],
+    "retrospective": ["historical", "retrocomputing"],
+    "rant": ["rant"],
+    "satire": ["satire"],
+    "design": ["a11y", "design", "visualization"],
+    "updates": ["release", "email"],
+    "operating systems": ["osdev", "android", "dragonflybsd", "freebsd", "illumos", "ios", "linux", "mac", "netbsd", "nix", "openbsd", "unix", "windows"],
+    "games": ["games"],
+    "cybersecurity": ["reversing", "security", "privacy"],
+    "devops": ["devops", "performance", "scaling", "testing", "virtualization", "distributed"],
+    "programming": [
+        "graphics", "databases", "merkle-trees", "mobile", "editors", "emacs", "systemd", "vcs", "vim", "vscode",
+        "programming", "compilers", "browsers", "ipv6", "wasm", "web", "api", "debugging", "practices", "apl",
+        "assembly", "c", "c++", "clojure", "css", "d", "dotnet", "elixir", "elm", "erlang", "fortran", "gleam", "go",
+        "haskell", "java", "javascript", "kotlin", "lisp", "lua", "ml", "nodejs", "objectivec", "perl", "php",
+        "python", "ruby", "rust", "scala", "swift", "zig"
+    ],
+}
+TAG_TO_CATEGORY = {tag: cat for cat, tags in TAG_CATEGORIES.items() for tag in tags}
+
+MIN_CATEGORY_COUNT = 100
+MAX_PAGES = 25
+# Structure : { tag: <min-count> / <category tags count> }
+CATEGORY_TAGS_COUNT = {tag: max(MIN_CATEGORY_COUNT // len(tags), 4) for tag, tags in TAG_CATEGORIES.items()}
+TAGS = list(TAG_TO_CATEGORY.keys())
 
 EXAMPLE_SUMMARIES = [
     {
@@ -108,7 +126,7 @@ def thread_safe_add_post(id, post):
             return False
 
 
-def fetch_content(url: str) -> str:
+def fetch_content(url: str) -> object | None:
     html_content = ""
     try:
         response = requests.get(url, headers=REQUEST_HEADERS, timeout=10)
@@ -171,6 +189,11 @@ def fetch_tag(tag: str) -> None:
 
     items_count = 0
     page = 1
+    category = TAG_TO_CATEGORY.get(tag, "other")
+    MIN_COUNT = CATEGORY_TAGS_COUNT.get(category, MIN_CATEGORY_COUNT)
+    STATS = {"tag": tag, "category": category, "min_count": MIN_COUNT}
+    print(json.dumps(STATS, indent=4))
+
     while True:
         try:
             # When we have the minimum amount of posts, we can stop fetching pages.
@@ -216,10 +239,9 @@ def fetch_tag(tag: str) -> None:
                 post = {
                     "link": post["url"],
                     "headline": post["title"],
-                    "category": "TECH",
+                    "category": TAG_TO_CATEGORY.get(tag, "other").upper(),
                     "short_description": summary,
                     "date": post["created_at"],
-                    "original_tag": tag,
                 }
                 if thread_safe_add_post(id, post):
                     items_count += 1
